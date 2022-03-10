@@ -1,9 +1,10 @@
 /* eslint-disable */
 import {Navbar,Container,Nav, NavDropdown } from 'react-bootstrap';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import logo from './logo.svg';
 import './App.css';
 import array from "./data.js"
+//import axios from 'axios';
 
 import {Link, Route,Switch} from 'react-router-dom';
 import Detail from "./Detail.js"
@@ -11,6 +12,7 @@ import Detail from "./Detail.js"
 function App() {
 
   let [shoes, shoes변경] = useState(array);
+  let [재고,재고변경] = useState([10,11,12]);
  
   return (
     <div className="App">
@@ -54,6 +56,15 @@ function App() {
           return <Product shoes={shoes[i]} i={i} key={i} />
         })
         }
+        <button className="btn btn-primary" onClick={()=>{
+          axios.get('https://codingapple1.github.io/shop/data2.json')
+          .then((result)=>{ shoes변경([...shoes, ...result.data ])  })
+          .catch(()=>{ })
+
+          axios.post('https://codingapple1.github.io/shop/data2.json', { id : 'test', pw : 1234})
+          .then((result)=>{  })
+          .catch(()=>{ })
+        }}>더보기</button>
       </div>
     </div>
 </Route>
@@ -61,7 +72,7 @@ function App() {
 
 
 <Route path="/detail/:id">
- <Detail shoes={shoes} /> 
+ <Detail shoes={shoes} 재고={재고} 재고변경={재고변경}/> 
 </Route> 
 
 <Route path="/:id">
