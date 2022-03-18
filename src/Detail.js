@@ -1,22 +1,43 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 //import './Detail.css'
 import './Detail.scss'
 
+import {재고context} from './App.js';
+
+import { connect } from 'react-redux';
+
 function Detail(props){
     
+    let 재고 =useContext(재고context);
+
+    //history.goback 등의 히스토리 내역을 기억하고, 이동가능하게 한다(뒤로가기)
     let history =useHistory();
+    
+    
     let {id} =useParams();
 
     let [ alert, alert변경 ] = useState(true);
     let [inputData, inputData변경] = useState('');
+
+    
+
     useEffect(()=>{
+      // setTimeout 함수: x초 후(여기선 2초)에 특정 코드를 실행해 주세요!
+      // setTimeout은 unmount 될 때, 다시 타이머 제거가 필요함! (clearTimeout 필요)
     let 타이머 = setTimeout(()=>{ alert변경(false) }, 2000);
     return ()=>{ clearTimeout(타이머) }
      }, []);
-  
-     
+     // useEffect 함수는  return 부분을 작성할  수도 있다.  
+     //return 부분에 작성된 코드는 해당 Component가 unMount 될 때,  실행 되는 코드부분이다!
+     // useEffect는 마지막에 ,[] 를 넣을 수 있는데  [] 는 useEffect 가 실행 될 때의 조건을 넣는 곳이다.
+     // 즉, [alert] 라고 적어 넣으면,
+     // 맨 처음 해당 component가 mount 될 때와, alert state가 변화가 있어 업데이트 될 때마다, 
+     // useEffect를 실행하게 된다.
+     // 여러개 넣을 수도 있다  [alert, inputData]
+     // 그냥 아무것도 안 적어두면 ([] 로 적어두면), 
+     // mount 될 때 실행 된 후, 영영 실행되지 않는다. (업데이트 될 때 실행되지 않는다.)
 
     let 제목 = styled.h4`
      font-size : 23px;
@@ -28,6 +49,26 @@ function Detail(props){
 
     return(
     <div className="container">
+        <div className="박스">
+          <div className="제목">Detail</div>
+        </div>
+
+        {/* input에 글이 작성 되면, 바로바로 그 값을 가져와서 inputData에 셋팅해주고, 화면에도 보여주는 코드 */}
+        {inputData}
+        <input onChange={(e)=>{inputData변경(e.target.value)}}/>
+
+
+
+        {
+          alert === true 
+          ? (<div className="my-alert">
+            <p>재고가 얼마 남지 않았습니다</p>
+            </div>)
+         : null
+        }
+        
+
+
     <div className="row">
       <div className="col-md-6">
         <img src="https://codingapple1.github.io/shop/shoes1.jpg" width="100%" />
@@ -41,14 +82,22 @@ function Detail(props){
 
         <button className="btn btn-danger" onClick={()=>{
               
-
+              props.dispatch({type : '항목추가', payload : {id : 2, name : '새로운상품', quan : 1} })
+              //개발환경에서 페이지 이동시, 강제 새로고침 안되게 하려면,,, history.push('/cart');
+              history.push('/cart'); 
         }}>주문하기</button> 
+
+
 
         <button className="btn btn-danger" onClick={()=>{
                 //history.push('/');
                 history.push('/메롱');
                 //istory.goBack();
         }}>뒤로가기</button> 
+
+
+      
+      
       </div>
     </div>
     </div> 
@@ -61,4 +110,13 @@ function Info(props){
   )
 }
 
-export default Detail;
+function state를props화(state){
+  console.log(state);
+  return {
+    state : state.reducer,
+    alert열렸니 : state.reducer2
+  }
+}
+
+export default connect(state를props화)(Detail)
+//export default Detail;

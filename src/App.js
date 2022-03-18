@@ -1,6 +1,6 @@
 /* eslint-disable */
 import {Navbar,Container,Nav, NavDropdown } from 'react-bootstrap';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import logo from './logo.svg';
 import './App.css';
 import array from "./data.js"
@@ -8,6 +8,26 @@ import array from "./data.js"
 
 import {Link, Route,Switch} from 'react-router-dom';
 import Detail from "./Detail.js"
+
+import Cart from './Cart.js';
+
+// let 재고context= React.createContext();
+// props 대신 context를 쓰자! ( 하위 컴포넌트들이 props 없이도 부모의 값을 공유해 사용 가능!)
+// React.createContext() 를 사용해야 함! ( 컴포넌트(function app  등) 밖에 생성해야 함!)
+// context를 생성 한 후, 같은 값을 공유할 HTML을 범위로 싸매기! 
+//  즉,  같은 값을 공유할 HTML 부분을 <생성한context이름.Provider value={공유 원하는 값}>
+// <재고context.Provider value={재고}>  로 감싸기
+// 즉, value에 들어간 {재고} array를 여러 곳에서 공유할 수 있다. props 없이 재고라는 state 사용 가능!
+// {재고}를 props 없이 바로 Card 라는 곳에서 사용 가능해짐. 
+// 대신 Card 컴포넌트에서  let 재고 = useContext(재고context);
+//let 변수이름 = useContext(생성한context이름);
+
+export let 재고context= React.createContext();
+// Datail.js 와 같이 다른 곳에서도 context 공유를 원하면, export 해줘야함 
+// 그리고 <Detail> html 부분을 <재고context.Provider value={재고}>    로 감싼다.
+// Detail.js 에서는 import 해줘야 함   import {재고context} from './App.js';
+// function Detail() 즉 Detail 컴포넌트 안에서도 let 재고 =useContext(재고context); 선언 해주고 사용해야 함
+
 
 function App() {
 
@@ -50,12 +70,18 @@ function App() {
   </p>
 </div>
 <div className="container">
-      <div className="row">
-        {
-        shoes.map((shoe,i)=>{
-          return <Product shoes={shoes[i]} i={i} key={i} />
-        })
-        }
+
+      <재고context.Provider value={재고}>
+        <div className="row">
+          {
+            shoes.map((shoe,i)=>{
+            return <Card shoes={shoes[i]} i={i} key={i} />
+            })
+          }
+        </div>
+      </재고context.Provider>
+
+
         <button className="btn btn-primary" onClick={()=>{
           axios.get('https://codingapple1.github.io/shop/data2.json')
           .then((result)=>{ shoes변경([...shoes, ...result.data ])  })
@@ -66,18 +92,32 @@ function App() {
           .catch(()=>{ })
         }}>더보기</button>
       </div>
-    </div>
+    
 </Route>
 
 
 
 <Route path="/detail/:id">
- <Detail shoes={shoes} 재고={재고} 재고변경={재고변경}/> 
+
+ <재고context.Provider value={재고}>   
+    <Detail shoes={shoes} 재고={재고} 재고변경={재고변경}/> 
+ </재고context.Provider>    
+
 </Route> 
 
-<Route path="/:id">
+{/* <Route exact path="/:id">
   <div>아무거나 적었을 때 이거 보여줘</div>
+</Route>  */}
+
+
+{/* npm install redux react-redux  설치 => props, context 대신 간편하게 사용 가능 
+  index.js 에 import {Provider} from 'react-redux'; 해준 후, <Provider>로 <App> 감싸기
+  <Provider>로 감싼 모든 컴포넌트들은 같은 state 공유 가능! 
+*/}
+<Route exact path="/cart">
+  <Cart></Cart>
 </Route> 
+
 
 </Switch>
 
@@ -95,14 +135,27 @@ function App() {
   );
 }
 
-function Product(props){
+function Card(props){
+
+  let 재고 = useContext(재고context);
+
   return(
      <div className="col-md-4">
        <img src={ 'https://codingapple1.github.io/shop/shoes'+ (props.i+1) +'.jpg'} width="100%"/>
        <h4>{props.shoes.title}</h4>  
-       <p>{props.shoes.content} & {props.shoes.price}</p>        
+       <p>{props.shoes.content} & {props.shoes.price}</p>     
+       {재고[props.i]}   
+       <Test></Test>
      </div>  
     )  
  }
+
+ // context를 사용했기 때문에, props 없이, 
+ //App 컴포넌트 밑에 Card 컴포 밑에 Test 컴포 에서도 바로 {재고} 사용가능
+ // 대신 useContext 로 어떤 범위 가져올 건지 선언 해주고 써야 함
+function Test(){
+  let 재고 = useContext(재고context);
+  return <p>재고: {재고}</p>
+}
 
 export default App;
