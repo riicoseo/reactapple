@@ -10,11 +10,11 @@ import {Provider} from 'react-redux';
 import { combineReducers, createStore } from 'redux';
 
 
-let store2 = createStore(()=>{return [{ id:0, name:'멋진신발', quan:2},
-{ id:1, name:'멋진신발2', quan:5}]});
 // 1. 예전 방법
 // createStore() 안에 state 초기값을 return []에  넣어 저장 
 // 만든 store 를 <Provider> 에 props 전송하듯이 전송
+let store2 = createStore(()=>{return [{ id:0, name:'멋진신발', quan:2},
+{ id:1, name:'멋진신발2', quan:5}]});
 
 
 //2. 현재 방법
