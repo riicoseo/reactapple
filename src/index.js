@@ -26,22 +26,30 @@ function reducer(state=초기값, 액션){
 
   if (액션.type === '항목추가') {
 
-    let 들어온데이터 =액션.payload;
-    let copy = [...state];
-    copy.push(들어온데이터);
-    return copy;
+    let found = state.findIndex((a)=>{return a.id===액션.payload.id });
+ 
+    if(found >= 0){
+      let copy = [...state];
+      copy[found].quan++;
+      return copy;
+    
+    } else {
+      let copy = [...state];
+      copy.push(액션.payload);
+      return copy;
+    }
 
   }
 
   else if(액션.type ==='수량증가'){
 
     let copy =[...state];
-    copy[0].quan++;
+    copy[액션.데이터].quan++;
     return copy
 
   }else if(액션.type ==='수량감소'){
     let copy =[...state];
-    copy[0].quan--;
+    copy[액션.데이터].quan--;
     return copy;
 
   }else{

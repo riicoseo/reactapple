@@ -1,15 +1,19 @@
 /* eslint-disable */
 import {Navbar,Container,Nav, NavDropdown } from 'react-bootstrap';
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect, useContext, lazy, Suspense} from 'react';
 import logo from './logo.svg';
 import './App.css';
 import array from "./data.js"
 //import axios from 'axios';
 
 import {Link, Route,Switch} from 'react-router-dom';
-import Detail from "./Detail.js"
+//import Detail from "./Detail.js"
+// 위 방법 대신 Detail 필요할 때, Detail 렌더링 불러오는 기술 lazy()
+let Detail = lazy(()=>{ return import('./Detail.js')});
+// 대신 lazy loading 이 필요한 곳에 가서 <Suspense> 태그로 감싸줘야 한다. 
 
 import Cart from './Cart.js';
+import { useHistory } from 'react-router-dom';
 
 // let 재고context= React.createContext();
 // props 대신 context를 쓰자! ( 하위 컴포넌트들이 props 없이도 부모의 값을 공유해 사용 가능!)
@@ -99,8 +103,11 @@ function App() {
 
 <Route path="/detail/:id">
 
- <재고context.Provider value={재고}>   
+ <재고context.Provider value={재고}> 
+  <Suspense fallback={<div>로딩중이에요</div>}>
     <Detail shoes={shoes} 재고={재고} 재고변경={재고변경}/> 
+   </Suspense>  
+    
  </재고context.Provider>    
 
 </Route> 
@@ -138,9 +145,12 @@ function App() {
 function Card(props){
 
   let 재고 = useContext(재고context);
+  let history = useHistory();
 
   return(
-     <div className="col-md-4">
+     <div className="col-md-4" onClick={()=>{
+       history.push('/detail/'+props.shoe.id);
+     }}>
        <img src={ 'https://codingapple1.github.io/shop/shoes'+ (props.i+1) +'.jpg'} width="100%"/>
        <h4>{props.shoes.title}</h4>  
        <p>{props.shoes.content} & {props.shoes.price}</p>     

@@ -1,5 +1,18 @@
 @import './App.css';
 
+/* 애니메이션 시작 시점 */
+.wow-enter{
+  opacity: 0;
+}
+
+/* 애니메이션 동작 시점 */
+.wow-enter-active{
+  opacity: 1;
+  transition: all 500ms;
+}
+
+
+
 $메인칼라 : #ff0000;
 
 .red {
